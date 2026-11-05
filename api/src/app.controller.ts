@@ -1,12 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { DataSource } from 'typeorm';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly db: DataSource) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('health')
+  async health() {
+    const r = await this.db.query('SELECT PostGIS_Version() AS postgis');
+    return { status: 'ok', database: 'connected', postgis: r[0].postgis };
   }
 }
